@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      body {
+        background: #263238;
+        color: #fff;
+      }
+      .input {
+        border: none !important;
+      }
+      .input:focus-visible {
+        border: none !important;
+        outline: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div contenteditable="plaintext-only" class="input">
+      const dom = document.querySelector(".input");
+      dom.addEventListener("change", (e) => { console.log(e); });
+      dom.addEventListener("input", (e) => { console.log(e); });
+    </div>
+    <script>
+      const dom = document.querySelector(".input");
+      dom.addEventListener("change", (e) => {
+        console.log(e);
+      });
+      dom.addEventListener("input", (e) => {
+        console.log(e);
+      });
+    </script>
+  </body>
+</html>
