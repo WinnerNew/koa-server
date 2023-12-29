@@ -38,12 +38,16 @@ router.post("/addUser", async (ctx, next) => {
   try {
     const { name, age, email } = ctx.request.body;
     const sql =
-      "INSERT INTO test_db.users (id,name,age,email) VALUES (10," +
+      "INSERT INTO test_db.users (id,name,age,email,updateTime) " +
+      "VALUES (99," +
+      '"' +
       name +
-      "," +
+      '",' +
       age +
       "," +
       email +
+      "," +
+      new Date().getTime() +
       ")";
     await mysql
       .query(sql)
