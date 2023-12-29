@@ -1,6 +1,6 @@
+// @ts-ignore
 const router = require("koa-router")();
-
-router.prefix("/users");
+const mysql = require("../utils/db"); //导入 db.js
 
 router.post("/signin", async (ctx, next) => {
   let name = ctx.request.body.name || "",
@@ -14,8 +14,53 @@ router.post("/signin", async (ctx, next) => {
   }
 });
 
-router.get("/", function (ctx, next) {
-  ctx.body = "this is a users response!";
+router.get("/users", async (ctx, next) => {
+  let sql = `select * from users`;
+  // const sql = `select * from lists`;
+  // 此处编写sql 语句 将新建的arr 里的内容 插入到表里面
+  await mysql
+    .query(sql)
+    .then(async (res) => {
+      ctx.body = {
+        data: res,
+      };
+    })
+    .catch((err) => {
+      console.log("添加错误", err);
+    });
+
+  // await ctx.render("index", {
+  //   title: "Hello Koa 2!",
+  // });
+});
+
+router.post("/addUser", async (ctx, next) => {
+  try {
+    const { name, age, email } = ctx.request.body;
+    const sql =
+      "INSERT INTO test_db.users (id,name,age,email) VALUES (10," +
+      name +
+      "," +
+      age +
+      "," +
+      email +
+      ")";
+    await mysql
+      .query(sql)
+      .then(async (res) => {
+        ctx.body = {
+          data: res,
+        };
+      })
+      .catch((err) => {
+        console.log("添加错误", err);
+      });
+  } catch (err) {
+    console.log(err, "---");
+    ctx.body = {
+      err,
+    };
+  }
 });
 
 router.get("/bar", function (ctx, next) {
