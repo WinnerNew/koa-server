@@ -14,10 +14,12 @@ router.post("/signin", async (ctx, next) => {
   }
 });
 
-router.get("/users", async (ctx, next) => {
-  let sql = `select * from users`;
-  // const sql = `select * from lists`;
-  // 此处编写sql 语句 将新建的arr 里的内容 插入到表里面
+// 查询用户
+router.post("/users", async (ctx, next) => {
+  const { pageNo, pageSize } = ctx.request.body;
+  const sql = `select name, age, email,updateTime from test_db.users limit ${
+    (pageNo - 1) * pageSize
+  }, ${pageSize};`;
   await mysql
     .query(sql)
     .then(async (res) => {
@@ -28,27 +30,16 @@ router.get("/users", async (ctx, next) => {
     .catch((err) => {
       console.log("添加错误", err);
     });
-
-  // await ctx.render("index", {
-  //   title: "Hello Koa 2!",
-  // });
 });
 
+// 添加用户
 router.post("/addUser", async (ctx, next) => {
   try {
+    const res = await mysql.query(`select * from users;`);
     const { name, age, email } = ctx.request.body;
-    const sql =
-      "INSERT INTO test_db.users (id,name,age,email,updateTime) " +
-      "VALUES (99," +
-      '"' +
-      name +
-      '",' +
-      age +
-      "," +
-      email +
-      "," +
-      new Date().getTime() +
-      ")";
+    const now = new Date().getTime();
+    const id = res.length;
+    const sql = `INSERT INTO test_db.users (id,name,age,email,updateTime) VALUES (${id},"${name}",${age},"${email}",${now})`;
     await mysql
       .query(sql)
       .then(async (res) => {
@@ -60,15 +51,50 @@ router.post("/addUser", async (ctx, next) => {
         console.log("添加错误", err);
       });
   } catch (err) {
-    console.log(err, "---");
     ctx.body = {
       err,
     };
   }
 });
 
-router.get("/bar", function (ctx, next) {
-  ctx.body = "this is a users/bar response";
+// 更新用户
+router.post("/updateUser", async (ctx, next) => {
+  try {
+    // const res = await mysql.query(`select * from users`);
+    const { name, age, email, id } = ctx.request.body;
+    const now = new Date().getTime();
+    const sql = `UPDATE test_db.users SET name="${name}", age=${age}, email="${email}", updateTime=${now} where id=${id};`;
+    await mysql
+      .query(sql)
+      .then(async (res) => {
+        ctx.body = {
+          data: res,
+        };
+      })
+      .catch((err) => {
+        console.log("添加错误", err);
+      });
+  } catch (err) {
+    ctx.body = {
+      err,
+    };
+  }
+});
+
+// 删除用户
+router.get("/delUser", async (ctx, next) => {
+  const { id } = ctx.request.query;
+  const sql = `delete from test_db.users where id = ${id};`;
+  await mysql
+    .query(sql)
+    .then(async (res) => {
+      ctx.body = {
+        data: res,
+      };
+    })
+    .catch((err) => {
+      console.log("添加错误", err);
+    });
 });
 
 module.exports = router;
